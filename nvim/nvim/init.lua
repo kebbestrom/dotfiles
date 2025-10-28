@@ -154,6 +154,13 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+function insert_full_path()
+  local filepath = vim.fn.expand('%')
+  vim.fn.setreg('+', filepath) -- write to clipboard
+end
+
+vim.keymap.set('n', '<leader>pc', insert_full_path, { noremap = true, silent = true })
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -172,7 +179,7 @@ require("lazy").setup({
   -- Scheme
   {
     "wincent/base16-nvim",
-    lazy = false, -- load at start
+    lazy = false,    -- load at start
     priority = 1000, -- load first
     config = function()
       vim.cmd([[colorscheme gruvbox-dark-hard]])
@@ -197,10 +204,10 @@ require("lazy").setup({
       "TmuxNavigatePrevious",
     },
     keys = {
-      { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
-      { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
-      { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
-      { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
       { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     },
   },
@@ -249,7 +256,7 @@ require("lazy").setup({
 
       -- Document existing key chains
       spec = {
-        { "<leader>c", group = "[C]ode", mode = { "n", "x" } },
+        { "<leader>c", group = "[C]ode",     mode = { "n", "x" } },
         { "<leader>d", group = "[D]ocument" },
         { "<leader>r", group = "[R]ename" },
         { "<leader>s", group = "[S]earch" },
@@ -284,7 +291,7 @@ require("lazy").setup({
       { "nvim-telescope/telescope-ui-select.nvim" },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+      { "nvim-tree/nvim-web-devicons",            enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -443,7 +450,7 @@ require("lazy").setup({
       -- Useful status updates for LSP.
       -- This is the progress messages located at the bottom right
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { "j-hui/fidget.nvim", opts = {} },
+      { "j-hui/fidget.nvim",       opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       "hrsh7th/cmp-nvim-lsp",
@@ -564,7 +571,14 @@ require("lazy").setup({
               },
               -- Run clippy on save.
               checkOnSave = {
+                enable = true,
                 command = "clippy",
+              },
+              disabled = { "unresolved-proc-macro" },
+              procMacro = {
+                ignored = {
+                  ['napi-derive'] = { 'napi' },
+                },
               },
             },
           },
@@ -638,6 +652,8 @@ require("lazy").setup({
         },
 
         eslint_d = {},
+
+        prettier = {},
 
         ltex = {
           enabled = false,
@@ -733,7 +749,7 @@ require("lazy").setup({
       formatters_by_ft = {
         lua = { "stylua" },
         -- Conform can also run multiple formatters sequentially
-        python = { "isort", "black" },
+        python = { "ruff" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         typescript = { "prettier" },
@@ -1038,8 +1054,8 @@ require("lazy").setup({
           Snacks.toggle.diagnostics():map("<leader>ud")
           Snacks.toggle.line_number():map("<leader>ul")
           Snacks.toggle
-            .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
-            :map("<leader>uc")
+              .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
+              :map("<leader>uc")
           Snacks.toggle.treesitter():map("<leader>uT")
           Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
           Snacks.toggle.inlay_hints():map("<leader>uh")
@@ -1072,7 +1088,7 @@ require("lazy").setup({
         desc = "Explorer NeoTree (cwd)",
       },
       { "<leader>e", "<leader>fe", desc = "Explorer NeoTree (Root Dir)", remap = true },
-      { "<leader>E", "<leader>fE", desc = "Explorer NeoTree (cwd)", remap = true },
+      { "<leader>E", "<leader>fE", desc = "Explorer NeoTree (cwd)",      remap = true },
       {
         "<leader>ge",
         function()
@@ -1163,7 +1179,7 @@ require("lazy").setup({
       local events = require("neo-tree.events")
       opts.event_handlers = opts.event_handlers or {}
       vim.list_extend(opts.event_handlers, {
-        { event = events.FILE_MOVED, handler = on_move },
+        { event = events.FILE_MOVED,   handler = on_move },
         { event = events.FILE_RENAMED, handler = on_move },
       })
       require("neo-tree").setup(opts)
@@ -1262,7 +1278,7 @@ require("lazy").setup({
       vim.g.lightline = {
         active = {
           left = {
-            { "mode", "paste" },
+            { "mode",     "paste" },
             { "readonly", "filename", "modified" },
           },
           right = {

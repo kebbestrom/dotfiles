@@ -193,6 +193,11 @@ require("lazy").setup({
     end,
   },
 
+  -- Git diff view
+  {
+    "sindrets/diffview.nvim",
+  },
+
   -- Enable navigation between tmux panes easier
   {
     "christoomey/vim-tmux-navigator",
@@ -837,6 +842,31 @@ require("lazy").setup({
       local cmp = require("cmp")
       local luasnip = require("luasnip")
       luasnip.config.setup({})
+
+      local ls = require("luasnip")
+      local s = ls.snippet
+      local t = ls.text_node
+      local i = ls.insert_node
+      local f = ls.function_node
+
+      ls.add_snippets("all", {
+        s("div", {
+          f(function()
+            -- Extract the comment prefix from commentstring (e.g. "// %s" -> "//")
+            local cs = vim.bo.commentstring
+            local prefix = cs:match("^(.-)%s*%%s") or "//"
+            local line = prefix .. " " .. string.rep("=", 96 - #prefix - 1)
+            return { line, prefix .. " " }
+          end),
+          i(1, "Replace me"),
+          f(function()
+            local cs = vim.bo.commentstring
+            local prefix = cs:match("^(.-)%s*%%s") or "//"
+            local line = prefix .. " " .. string.rep("=", 96 - #prefix - 1)
+            return { "", line }
+          end),
+        }),
+      })
 
       cmp.setup({
         snippet = {
